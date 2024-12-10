@@ -1,4 +1,3 @@
-// src/features/projects/projectsSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const projectsSlice = createSlice({
