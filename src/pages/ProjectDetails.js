@@ -4,22 +4,25 @@ import { useParams, Link } from 'react-router-dom';
 import {
   Box,
   Typography,
+  Grid,
+  Card,
+  CardContent,
+  Avatar,
   Button,
+  Checkbox,
   TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
-  Card,
-  CardContent,
-  Avatar,
-  Checkbox,
   Select,
   MenuItem,
 } from '@mui/material';
-import { addTask, removeTask } from '../features/tasks/tasksSlice';
-import { addPersonToProject, removePersonFromProject } from '../features/projects/projectsSlice';
+import { addTask, removeTask, updateTaskStatus } from '../features/tasks/tasksSlice';
+import {
+  addPersonToProject,
+  removePersonFromProject,
+} from '../features/projects/projectsSlice';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -40,28 +43,41 @@ const ProjectDetails = () => {
 
   const isAdmin = user?.role === 'admin';
 
-  // Функції
+  // Додавання завдання
   const handleAddTask = () => {
-    dispatch(addTask({ id: Date.now().toString(), title: taskTitle, projectId: id, assignedTo: personEmail }));
-    setTaskDialogOpen(false);
-    setTaskTitle('');
-    setPersonEmail('');
+    if (taskTitle && personEmail) {
+      dispatch(addTask({ id: Date.now().toString(), title: taskTitle, projectId: id, assignedTo: personEmail }));
+      setTaskDialogOpen(false);
+      setTaskTitle('');
+      setPersonEmail('');
+    }
   };
 
-  const handleAddPerson = () => {
-    dispatch(addPersonToProject({ projectId: id, personEmail }));
-    setPersonDialogOpen(false);
-    setPersonEmail('');
-  };
-
+  // Видалення завдання
   const handleDeleteTask = (taskId) => {
     dispatch(removeTask(taskId));
   };
 
+  // Додавання учасника
+  const handleAddPerson = () => {
+    if (personEmail) {
+      dispatch(addPersonToProject({ projectId: id, personEmail }));
+      setPersonDialogOpen(false);
+      setPersonEmail('');
+    }
+  };
+
+  // Видалення учасника
   const handleRemovePerson = (personEmail) => {
     dispatch(removePersonFromProject({ projectId: id, personEmail }));
   };
 
+  // Зміна статусу завдання
+  const handleTaskStatusChange = (taskId, currentStatus) => {
+    dispatch(updateTaskStatus({ id: taskId, completed: !currentStatus }));
+  };
+
+  // Функція для отримання даних учасника
   const getUserData = (email) => users.find((u) => u.email === email) || {};
 
   return (
@@ -83,7 +99,14 @@ const ProjectDetails = () => {
             const userData = getUserData(email);
             return (
               <Grid item xs={12} sm={6} md={4} key={email}>
-                <Card sx={{ display: 'flex', alignItems: 'center', padding: '16px', border: '1px solid #ddd' }}>
+                <Card
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '16px',
+                    border: '1px solid #ddd',
+                  }}
+                >
                   <Avatar sx={{ mr: 2, bgcolor: '#1976d2' }}>{userData.name?.[0]?.toUpperCase()}</Avatar>
                   <Box>
                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -94,7 +117,12 @@ const ProjectDetails = () => {
                     </Typography>
                   </Box>
                   {isAdmin && (
-                    <Button color="error" onClick={() => handleRemovePerson(email)} sx={{ ml: 'auto' }}>
+                    <Button
+                      color="error"
+                      size="small"
+                      onClick={() => handleRemovePerson(email)}
+                      sx={{ ml: 'auto' }}
+                    >
                       Видалити
                     </Button>
                   )}
@@ -104,7 +132,7 @@ const ProjectDetails = () => {
           })}
         </Grid>
         {isAdmin && (
-          <Button variant="contained" sx={{ mt: 2 }} onClick={() => setPersonDialogOpen(true)}>
+          <Button variant="contained" onClick={() => setPersonDialogOpen(true)} sx={{ mt: 2 }}>
             Додати учасника
           </Button>
         )}
@@ -120,7 +148,15 @@ const ProjectDetails = () => {
             const assignee = getUserData(task.assignedTo);
             return (
               <Grid item xs={12} sm={6} md={4} key={task.id}>
-                <Card sx={{ padding: '16px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Card
+                  sx={{
+                    padding: '16px',
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                  }}
+                >
                   <CardContent>
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                       {task.title}
@@ -128,7 +164,9 @@ const ProjectDetails = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                       <Avatar sx={{ bgcolor: '#1976d2' }}>{assignee.name?.[0]?.toUpperCase()}</Avatar>
                       <Box>
-                        <Typography variant="body2">Призначено: {assignee.name || 'Невідомо'}</Typography>
+                        <Typography variant="body2">
+                          Призначено: {assignee.name || 'Невідомо'}
+                        </Typography>
                         <Typography
                           variant="body2"
                           sx={{
@@ -141,11 +179,15 @@ const ProjectDetails = () => {
                       </Box>
                     </Box>
                     {task.assignedTo === user.email && (
-                      <Checkbox checked={task.completed || false} onChange={() => console.log('Зміна статусу завдання')} sx={{ mt: 2 }} />
+                      <Checkbox
+                        checked={task.completed || false}
+                        onChange={() => handleTaskStatusChange(task.id, task.completed)}
+                        sx={{ mt: 2 }}
+                      />
                     )}
                   </CardContent>
                   {isAdmin && (
-                    <Button color="error" onClick={() => handleDeleteTask(task.id)}>
+                    <Button color="error" size="small" onClick={() => handleDeleteTask(task.id)}>
                       Видалити
                     </Button>
                   )}
@@ -155,7 +197,7 @@ const ProjectDetails = () => {
           })}
         </Grid>
         {isAdmin && (
-          <Button variant="contained" sx={{ mt: 2 }} onClick={() => setTaskDialogOpen(true)}>
+          <Button variant="contained" onClick={() => setTaskDialogOpen(true)} sx={{ mt: 2 }}>
             Додати завдання
           </Button>
         )}
@@ -163,7 +205,13 @@ const ProjectDetails = () => {
 
       {/* Посилання на чат */}
       <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Button variant="contained" color="primary" component={Link} to="/chat" sx={{ fontWeight: 'bold' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/chat"
+          sx={{ fontWeight: 'bold' }}
+        >
           Перейти до чату
         </Button>
       </Box>
@@ -172,14 +220,25 @@ const ProjectDetails = () => {
       <Dialog open={isTaskDialogOpen} onClose={() => setTaskDialogOpen(false)}>
         <DialogTitle>Додати завдання</DialogTitle>
         <DialogContent>
-          <TextField fullWidth label="Назва завдання" value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} sx={{ mb: 2 }} />
-          <Select fullWidth value={personEmail} onChange={(e) => setPersonEmail(e.target.value)} displayEmpty>
+          <TextField
+            fullWidth
+            label="Назва завдання"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Select
+            fullWidth
+            value={personEmail}
+            onChange={(e) => setPersonEmail(e.target.value)}
+            displayEmpty
+          >
             <MenuItem value="" disabled>
               Виберіть виконавця
             </MenuItem>
-            {project.team.map((email) => (
-              <MenuItem key={email} value={email}>
-                {getUserData(email)?.name || email}
+            {project.team.map((personEmail) => (
+              <MenuItem key={personEmail} value={personEmail}>
+                {getUserData(personEmail).name || personEmail}
               </MenuItem>
             ))}
           </Select>
