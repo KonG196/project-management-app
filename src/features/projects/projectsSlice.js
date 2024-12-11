@@ -5,7 +5,8 @@ const projectsSlice = createSlice({
   initialState: [],
   reducers: {
     addProject: (state, action) => {
-      state.push(action.payload);
+      const { id, name, description, team } = action.payload;
+      state.push({ id, name, description, team: team || [] });
     },
     removeProject: (state, action) => {
       return state.filter((project) => project.id !== action.payload);
@@ -18,8 +19,16 @@ const projectsSlice = createSlice({
         project.description = description;
       }
     },
+    addPersonToProject: (state, action) => {
+      const { projectId, personId } = action.payload;
+      const project = state.find((project) => project.id === projectId);
+      if (project && !project.team.includes(personId)) {
+        project.team.push(personId);
+      }
+    },
   },
 });
 
-export const { addProject, removeProject, updateProject } = projectsSlice.actions;
+export const { addProject, removeProject, updateProject, addPersonToProject } =
+  projectsSlice.actions;
 export default projectsSlice.reducer;

@@ -1,16 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+  isAuthenticated: JSON.parse(localStorage.getItem('isAuthenticated')) || false,
+  user: JSON.parse(localStorage.getItem('user')) || null,
+};
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { isAuthenticated: false, user: null },
+  initialState,
   reducers: {
-    login: (state, action) => {
+    login(state, action) {
       state.isAuthenticated = true;
-      state.user = action.payload; // Збереження даних користувача
+      state.user = action.payload;
+      localStorage.setItem('isAuthenticated', true);
+      localStorage.setItem('user', JSON.stringify(action.payload));
     },
-    logout: (state) => {
+    logout(state) {
       state.isAuthenticated = false;
-      state.user = null; // Видалення даних користувача
+      state.user = null;
+      localStorage.removeItem('isAuthenticated');
     },
   },
 });

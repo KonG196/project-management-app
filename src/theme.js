@@ -3,14 +3,17 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#007bff', // Синій
+      main: '#efb11d', // Синій
     },
-    secondary: {
-      main: '#6c757d', // Сірий
-    },
+    text:{
+      main: '#2e3944'
+    }
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: 'CoFoSans-Regular,  sans-serif',
+    h5: {
+      fontFamily: 'CoFoSans-Regular',
+    },
   },
 });
 

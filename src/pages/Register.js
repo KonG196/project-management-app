@@ -1,75 +1,89 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { login } from '../features/authSlice';
-import { Box, TextField, Button, Typography, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import AuthForm from '../components/AuthForm';
+import { Button } from '@mui/material';
 
 const Register = () => {
-  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const navigate = useNavigate();
 
-  const handleRegister = () => {
-    if (password === confirmPassword) {
-      dispatch(login({ email }));
-      console.log('Успішна реєстрація:', email);
-    } else {
-      console.error('Паролі не співпадають!');
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    let role = 'user'; // За замовчуванням звичайний користувач
+    if (email === 'maks060691@gmail.com') {
+      role = 'admin'; // Адміністратор
     }
+
+    if (password !== confirmPassword) {
+      alert('Паролі не співпадають');
+      return;
+    }
+
+    const newUser = { email, password, name, role };
+
+    // Отримати існуючих користувачів
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    // Перевірити, чи існує користувач з таким email
+    if (users.some((user) => user.email === email)) {
+      alert('Користувач з такою електронною поштою вже існує');
+      return;
+    }
+
+    // Додати нового користувача до масиву
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    console.log('Зареєстрований користувач:', newUser);
+
+    // Перенаправити на сторінку входу
+    navigate('/login');
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="100vh"
-      sx={{ backgroundColor: '#f5f5f5' }}
-    >
-      <Box sx={{ width: '300px', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}>
-        <Typography variant="h5" mb={2}>
-          Реєстрація
-        </Typography>
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          sx={{ marginBottom: '20px' }}
-        />
-        <TextField
-          label="Пароль"
-          type="password"
-          variant="outlined"
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          sx={{ marginBottom: '20px' }}
-        />
-        <TextField
-          label="Підтвердити пароль"
-          type="password"
-          variant="outlined"
-          fullWidth
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          sx={{ marginBottom: '20px' }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          onClick={handleRegister}
-        >
-          Зареєструватися
+    <AuthForm
+      title="Реєстрація"
+      fields={[
+        {
+          label: "Ім'я",
+          type: 'text',
+          value: name,
+          onChange: (e) => setName(e.target.value),
+          required: true,
+        },
+        {
+          label: 'Email',
+          type: 'email',
+          value: email.toLowerCase(),
+          onChange: (e) => setEmail(e.target.value),
+          required: true,
+        },
+        {
+          label: 'Пароль',
+          type: 'password',
+          value: password,
+          onChange: (e) => setPassword(e.target.value),
+          required: true,
+        },
+        {
+          label: 'Підтвердити пароль',
+          type: 'password',
+          value: confirmPassword,
+          onChange: (e) => setConfirmPassword(e.target.value),
+          required: true,
+        },
+      ]}
+      onSubmit={handleRegister}
+      footer={
+        <Button onClick={() => navigate('/login')} variant="text" color="secondary">
+          Увійти
         </Button>
-        <Typography mt={2} align="center">
-          Маєте акаунт? <Link href="/login">Увійти</Link>
-        </Typography>
-      </Box>
-    </Box>
+      }
+    />
   );
 };
 
