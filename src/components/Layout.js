@@ -14,8 +14,13 @@ import {
   IconButton,
   Button,
 } from '@mui/material';
+
 import MenuIcon from '@mui/icons-material/Menu';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { AiOutlineInstagram } from 'react-icons/ai';
+
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from '@mui/icons-material/GitHub';
+
 
 const drawerWidth = 240;
 
@@ -37,14 +42,14 @@ const Layout = ({ children }) => {
   const role = user?.email === 'maks060691@gmail.com' ? 'Адміністратор' : 'Розробник';
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', color: '#1f1704' }}>
       {/* Header */}
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton color="inherit" edge="start" onClick={toggleDrawer}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h5" noWrap component="div">
             HoReCa Management Solution
           </Typography>
         </Toolbar>
@@ -59,7 +64,7 @@ const Layout = ({ children }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: '#ffcc00', // Колір як у хедера
+            backgroundColor: '#efb11d',
           },
         }}
       >
@@ -73,92 +78,75 @@ const Layout = ({ children }) => {
             justifyContent: 'space-between',
           }}
         >
-          <List>
-            <ListItem button component={Link} to="/">
-              <ListItemText primary="Головна" sx={{ color: '#4a4a4a' }} />
+          <List sx={{ color: '#1f1704', fontSize: '20px' }}>
+            <ListItem button component={Link} to="/" sx={{ color: '#1f1704', padding: '15px 15px' }}>
+              <ListItemText primary="Головна" />
             </ListItem>
-            <ListItem button component={Link} to="/projects">
-              <ListItemText primary="Проекти" sx={{ color: '#4a4a4a' }} />
-            </ListItem>
-            <ListItem button component={Link} to="/tasks">
-              <ListItemText primary="Завдання" sx={{ color: '#4a4a4a' }} />
-            </ListItem>
-            <ListItem button component={Link} to="/team">
-              <ListItemText primary="Команда" sx={{ color: '#4a4a4a' }} />
+            {role !== 'Адміністратор' && (
+              <>
+                <ListItem button component={Link} to="/tasks" sx={{ color: '#1f1704', padding: '15px 15px' }}>
+                  <ListItemText primary="Завдання" />
+                </ListItem>
+              </>
+            )}
+            <ListItem button component={Link} to="/chat" sx={{ color: '#1f1704', padding: '15px 15px' }}>
+              <ListItemText primary="Чат" />
             </ListItem>
           </List>
 
-          {/* Footer для користувача */}
+          {/* Footer в Drawer */}
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              backgroundColor: '#f9a825',
               padding: '16px',
-              width: '100%',
-              boxSizing: 'border-box',
             }}
           >
-            {/* Іконка та інформація про користувача */}
             <Box
               sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                backgroundColor: '#1976d2',
+                color: '#fff',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                gap: '8px',
-                textAlign: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
               }}
             >
-              <Box
-                sx={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: '50%',
-                  backgroundColor: '#1976d2',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                }}
-              >
-                {user?.name?.[0].toUpperCase()}
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {user?.name}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {user?.role === 'admin' ? 'Адміністратор' : 'Розробник'}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  wordWrap: 'break-word',
-                  maxWidth: '150px',
-                  overflowWrap: 'break-word',
-                }}
-              >
-                {user?.email}
-              </Typography>
+              {user?.name?.[0].toUpperCase()}
             </Box>
-
-            {/* Кнопка виходу */}
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
+              {user?.name}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {role}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                wordWrap: 'break-word',
+                maxWidth: '200px',
+                overflowWrap: 'break-word',
+                mt: 1,
+              }}
+            >
+              {user?.email}
+            </Typography>
             <Button
               variant="contained"
               color="secondary"
               sx={{
                 width: '100%',
                 marginTop: '16px',
-
               }}
               onClick={handleLogout}
             >
               Вийти
             </Button>
           </Box>
-
         </Box>
       </Drawer>
 
@@ -168,16 +156,41 @@ const Layout = ({ children }) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          ml: isDrawerOpen ? `${drawerWidth}px` : 0, // Динамічний відступ
-          transition: (theme) => theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
+          ml: isDrawerOpen ? `${drawerWidth}px` : 0,
         }}
       >
         <Toolbar />
         <Outlet />
         {children}
+
+        {/* Footer на сторінці */}
+        <Box
+          sx={{
+            mt: 4,
+            p: 3,
+            padding: "13px",
+            borderTop: '1px solid #ccc',
+            textAlign: 'center',
+
+          }}
+        >
+          <Typography variant="body1">© Нагина Максим 2024. Усі права захищені.</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+            <IconButton component="a" href="https://www.instagram.com/just___maks/" target="_blank" color="primary">
+              <AiOutlineInstagram size={24} />
+            </IconButton>
+
+            <IconButton component="a" href="https://linkedin.com/in/maksym-nahyna-4518ab277" target="_blank" color="primary">
+              <LinkedInIcon />
+            </IconButton>
+            <IconButton component="a" href="https://github.com/KonG196" target="_blank" color="primary">
+              <GitHubIcon />
+            </IconButton>
+            <IconButton component="a" href="mailto:maks060691@gmail.com" target="_blank" color="primary">
+              Gmail
+            </IconButton>
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

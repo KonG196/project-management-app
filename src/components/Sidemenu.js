@@ -14,7 +14,7 @@ const SideMenu = () => {
 
   return (
     <Drawer
-      variant="permanent" // Якщо потрібно постійно відображати меню
+      variant="permanent" 
       anchor="left"
       sx={{
         '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box' },

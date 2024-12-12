@@ -6,6 +6,7 @@ import Login from './pages/LoginPage';
 import Register from './pages/Register';
 import Layout from './components/Layout';
 import ProtectedRoute from './features/ProtectedRoute';
+import Chat from './pages/Chat'; // Імпортуємо компонент Chat
 
 function App() {
   return (
@@ -32,6 +33,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <ProjectDetails />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat" // Новий маршрут для чату
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Chat />
               </Layout>
             </ProtectedRoute>
           }
