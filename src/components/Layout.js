@@ -39,7 +39,18 @@ const Layout = ({ children }) => {
     navigate('/login');
   };
 
-  const role = user?.email === 'maks060691@gmail.com' ? 'Адміністратор' : 'Розробник';
+  const role = (() => {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const currentUser = users.find((u) => u.email === user?.email);
+
+    switch (currentUser?.role) {
+      case 'admin':
+        return 'Адміністратор';
+      case 'user':
+        return 'Розробник';
+    }
+  })();
+
 
   return (
     <Box sx={{ display: 'flex', color: '#1f1704' }}>
@@ -78,19 +89,19 @@ const Layout = ({ children }) => {
             justifyContent: 'space-between',
           }}
         >
-          <List sx={{ color: '#1f1704', fontSize: '20px' }}>
+          <List sx={{ color: '#1f1704' }}>
             <ListItem button component={Link} to="/" sx={{ color: '#1f1704', padding: '15px 15px' }}>
-              <ListItemText primary="Головна" />
+              <ListItemText primary="Головна" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
             </ListItem>
             {role !== 'Адміністратор' && (
               <>
                 <ListItem button component={Link} to="/tasks" sx={{ color: '#1f1704', padding: '15px 15px' }}>
-                  <ListItemText primary="Завдання" />
+                  <ListItemText primary="Завдання" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
                 </ListItem>
               </>
             )}
             <ListItem button component={Link} to="/chat" sx={{ color: '#1f1704', padding: '15px 15px' }}>
-              <ListItemText primary="Чат" />
+              <ListItemText primary="Чат" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
             </ListItem>
           </List>
 
@@ -125,16 +136,19 @@ const Layout = ({ children }) => {
               {role}
             </Typography>
             <Typography
-              variant="body2"
-              sx={{
-                wordWrap: 'break-word',
-                maxWidth: '200px',
-                overflowWrap: 'break-word',
-                mt: 1,
-              }}
-            >
-              {user?.email}
-            </Typography>
+  variant="body2"
+  color="textSecondary"
+  sx={{
+    maxWidth: '200px', // Максимальна ширина блоку
+    whiteSpace: 'nowrap', // Заборонити перенос рядка
+    overflow: 'hidden', // Приховати текст, що виходить за межі
+    textOverflow: 'ellipsis', // Додати "..." для обрізаного тексту
+    fontSize: user?.email?.length > 25 ? '0.8rem' : '1rem', // Динамічний розмір шрифта
+    textAlign: 'center', // Вирівнювання по центру
+  }}
+>
+  {user?.email}
+</Typography>
             <Button
               variant="contained"
               color="secondary"

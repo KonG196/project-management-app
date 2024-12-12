@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '../features/authSlice';
 import AuthForm from '../components/AuthForm';
 import { Button } from '@mui/material';
+import { verifyPassword } from '../components/encryptUsers'; // Імпорт bcrypt функції перевірки
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -12,24 +13,26 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // Отримати список зареєстрованих користувачів
     const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Знайти користувача з відповідними даними
-    const user = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
+    // Знайти користувача з відповідним email
+    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
 
     if (user) {
-      dispatch(login(user));
-      console.log('Логін успішний:', user);
-      navigate('/');
-    } else {
-      setError('Невірний email або пароль');
+      const isPasswordMatch = await verifyPassword(password, user.password);
+      if (isPasswordMatch) {
+        dispatch(login(user));
+        console.log('Логін успішний:', user);
+        navigate('/');
+        return;
+      }
     }
+
+    setError('Невірний email або пароль');
   };
 
   return (

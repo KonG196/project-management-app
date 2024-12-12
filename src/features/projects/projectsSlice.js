@@ -8,7 +8,7 @@ const projectsSlice = createSlice({
       state.push(action.payload);
     },
     removeProject: (state, action) => {
-      return state.filter((project) => project.id !== action.payload.projectId);
+      return state.filter((project) => project.id !== action.payload); // Використовуємо action.payload
     },
     addPersonToProject: (state, action) => {
       const { projectId, personEmail } = action.payload;

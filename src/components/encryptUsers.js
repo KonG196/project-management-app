@@ -1,29 +1,15 @@
-const fs = require('fs');
-const CryptoJS = require('crypto-js');
+import bcrypt from 'bcryptjs';
 
-// Дані про користувачів
-const users = [
-  {
-    email: 'maks060691@gmail.com',
-    password: 'password123',
-    name: 'Admin',
-    role: 'admin',
-  },
-  {
-    email: 'user1@example.com',
-    password: 'userpassword',
-    name: 'User One',
-    role: 'user',
-  },
-];
+const SALT_ROUNDS = 10; // Кількість ітерацій для генерації salt
 
-// Ключ шифрування
-const secretKey = 'my-secret-key';
+// Шифрування пароля
+export const encryptPassword = async (password) => {
+  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS); // Хешування пароля з salt
+  return hashedPassword;
+};
 
-// Шифрування даних
-const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(users), secretKey).toString();
-
-// Запис у JSON-файл
-fs.writeFileSync('users.json', JSON.stringify({ data: encryptedData }));
-
-console.log('Дані успішно зашифровані та збережені!');
+// Перевірка пароля
+export const verifyPassword = async (password, hashedPassword) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword); // Порівняння пароля з хешем
+  return isMatch; // Повертає true, якщо пароль співпадає
+};

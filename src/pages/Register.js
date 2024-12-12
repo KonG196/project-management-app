@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import { Button } from '@mui/material';
+import { encryptPassword } from '../components/encryptUsers'; // Імпорт bcrypt функції
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -10,11 +11,11 @@ const Register = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     let role = 'user'; // За замовчуванням звичайний користувач
-    if (email === 'maks060691@gmail.com') {
+    if (email.includes('.admin@')) {
       role = 'admin'; // Адміністратор
     }
 
@@ -23,11 +24,12 @@ const Register = () => {
       return;
     }
 
-    const newUser = { email, password, name, role };
+    const hashedPassword = await encryptPassword(password); // Хешуємо пароль
+    const newUser = { email, password: hashedPassword, name, role };
 
     // Отримати існуючих користувачів
     const users = JSON.parse(localStorage.getItem('users')) || [];
-    
+
     // Перевірити, чи існує користувач з таким email
     if (users.some((user) => user.email === email)) {
       alert('Користувач з такою електронною поштою вже існує');

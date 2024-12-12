@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -22,6 +22,7 @@ import { addTask, removeTask, updateTaskStatus } from '../features/tasks/tasksSl
 import {
   addPersonToProject,
   removePersonFromProject,
+  removeProject,
 } from '../features/projects/projectsSlice';
 
 const ProjectDetails = () => {
@@ -31,6 +32,7 @@ const ProjectDetails = () => {
   const users = JSON.parse(localStorage.getItem('users')) || [];
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const project = projects.find((p) => p.id === id);
 
@@ -38,6 +40,7 @@ const ProjectDetails = () => {
   const [personEmail, setPersonEmail] = useState('');
   const [isTaskDialogOpen, setTaskDialogOpen] = useState(false);
   const [isPersonDialogOpen, setPersonDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (!project) return <Typography>Проект не знайдено</Typography>;
 
@@ -77,11 +80,17 @@ const ProjectDetails = () => {
     dispatch(updateTaskStatus({ id: taskId, completed: !currentStatus }));
   };
 
+  // Видалення проєкту
+  const handleDeleteProject = () => {
+    dispatch(removeProject(id));
+    navigate('/');
+  };
+
   // Функція для отримання даних учасника
   const getUserData = (email) => users.find((u) => u.email === email) || {};
 
   return (
-    <Box sx={{ padding: '24px', minHeight: '100vh' }}>
+    <Box sx={{ padding: '24px', minHeight: 'auto', position: 'relative' }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
         {project.name}
       </Typography>
@@ -203,18 +212,24 @@ const ProjectDetails = () => {
         )}
       </Box>
 
-      {/* Посилання на чат */}
-      <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          component={Link}
-          to="/chat"
-          sx={{ fontWeight: 'bold' }}
+      {/* Кнопка видалення */}
+      {isAdmin && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+          }}
         >
-          Перейти до чату
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            Видалити проект
+          </Button>
+        </Box>
+      )}
 
       {/* Діалог додавання завдання */}
       <Dialog open={isTaskDialogOpen} onClose={() => setTaskDialogOpen(false)}>
@@ -277,6 +292,32 @@ const ProjectDetails = () => {
           <Button onClick={() => setPersonDialogOpen(false)}>Скасувати</Button>
           <Button variant="contained" onClick={handleAddPerson}>
             Додати
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Діалог підтвердження видалення */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Видалення проекту</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Ви впевнені, що хочете видалити проект "{project.name}"? Ця дія є
+            незворотною.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+            Скасувати
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteProject}
+          >
+            Видалити
           </Button>
         </DialogActions>
       </Dialog>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { addProject } from '../features/projects/projectsSlice';
-import { removeTask } from '../features/tasks/tasksSlice';
+import { addTask, removeTask } from '../features/tasks/tasksSlice';
 import {
   Box,
   Typography,
@@ -19,6 +19,10 @@ import {
   CardActions,
   IconButton,
   InputBase,
+  Select,
+  MenuItem,
+  Avatar,
+  Stack,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -36,8 +40,12 @@ const Dashboard = () => {
   const [searchQueryTasks, setSearchQueryTasks] = useState('');
   const [searchQueryProjects, setSearchQueryProjects] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskProjectId, setTaskProjectId] = useState('');
+  const [taskAssignee, setTaskAssignee] = useState('');
 
   const filteredTasks = user.role === 'admin' ? tasks : userTasks;
   const filteredProjects = user.role === 'admin' ? projects : userProjects;
@@ -52,10 +60,31 @@ const Dashboard = () => {
           id: Date.now().toString(),
           name: projectName,
           description: description || 'Без опису',
-          team: [user.email],
+          team: [],
         })
       );
       handleDialogClose();
+    }
+  };
+
+  const handleTaskDialogOpen = () => setTaskDialogOpen(true);
+  const handleTaskDialogClose = () => setTaskDialogOpen(false);
+
+  const handleAddTask = () => {
+    if (taskTitle && taskProjectId && taskAssignee) {
+      dispatch(
+        addTask({
+          id: Date.now().toString(),
+          title: taskTitle,
+          projectId: taskProjectId,
+          assignedTo: taskAssignee,
+          completed: false,
+        })
+      );
+      setTaskDialogOpen(false);
+      setTaskTitle('');
+      setTaskProjectId('');
+      setTaskAssignee('');
     }
   };
 
@@ -73,14 +102,15 @@ const Dashboard = () => {
   return (
     <Box sx={{ minHeight: '70vh', padding: '16px' }}>
       <Grid container spacing={3} mt={2}>
-      <Grid
-    item
-    xs={5}
-    sx={{
-      borderRight: '1px solid #ccc', // Вертикальна перегородка
-      pr: 3, // Відступ справа
-    }}
-  >
+        {/* Tasks Section */}
+        <Grid
+          item
+          xs={5}
+          sx={{
+            borderRight: '1px solid #ccc',
+            pr: 3,
+          }}
+        >
           <Typography variant="h5">
             {user.role === 'admin' ? 'Всі завдання' : 'Мої завдання'}
           </Typography>
@@ -92,71 +122,79 @@ const Dashboard = () => {
               sx={{ flex: 1 }}
             />
           </Box>
+          {user.role === 'admin' && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleTaskDialogOpen}
+              sx={{ mb: 2 }}
+            >
+              Додати завдання
+            </Button>
+          )}
           <Grid container spacing={2} justifyContent="center">
-  {filteredTasks.length > 0 ? (
-    filteredTasks.map((task) => {
-      // Знаходимо назву проєкту за projectId
-      const project = projects.find((proj) => proj.id === task.projectId);
-      const projectName = project ? project.name : 'Без проєкту';
+            {filteredTasks.length > 0 ? (
+              filteredTasks.map((task) => {
+                const project = projects.find((proj) => proj.id === task.projectId);
+                const projectName = project ? project.name : 'Без проєкту';
 
-      return (
-        <Grid item xs={12} sm={6} key={task.id}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">{task.title}</Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontStyle: 'italic', color: 'gray', ml: 2 }}
-                >
-                  {projectName}
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="textSecondary">
-                Призначено: {task.assignedTo === user.email ? 'Мені' : task.assignedTo}
-              </Typography>
+                return (
+                  <Grid item xs={12} sm={6} key={task.id}>
+                    <Card sx={{ minWidth: 250, maxWidth: 400 }}>
+                      <CardContent>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography variant="h6">{task.title}</Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontStyle: 'italic', color: 'gray', ml: 2 }}
+                          >
+                            {projectName}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" color="textSecondary">
+                          Призначено: {task.assignedTo === user.email ? 'Мені' : task.assignedTo}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: task.completed ? 'green' : 'red',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Статус: {task.completed ? 'Виконано' : 'Не виконано'}
+                        </Typography>
+                      </CardContent>
+                      {user.role === 'admin' && (
+                        <CardActions>
+                          <IconButton color="error" onClick={() => handleDeleteTask(task.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </CardActions>
+                      )}
+                    </Card>
+                  </Grid>
+                );
+              })
+            ) : (
               <Typography
-                variant="body2"
-                sx={{
-                  color: task.completed ? 'green' : 'red',
-                  fontWeight: 'bold',
-                }}
+                variant="body1"
+                sx={{ mt: 2, textAlign: 'center', color: 'gray', width: '100%' }}
               >
-                Статус: {task.completed ? 'Виконано' : 'Не виконано'}
+                У вас немає завдань
               </Typography>
-              {task.assignedTo === user.email && (
-                <Checkbox
-                  checked={task.completed || false}
-                  onChange={() => handleTaskCompletionChange(task.id)}
-                  label="Виконано"
-                />
-              )}
-            </CardContent>
-            {user.role === 'admin' && (
-              <CardActions>
-                <IconButton color="error" onClick={() => handleDeleteTask(task.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </CardActions>
             )}
-          </Card>
-        </Grid>
-      );
-    })
-  ) : (
-    <Typography
-      variant="body1"
-      sx={{ mt: 2, textAlign: 'center', color: 'gray', width: '100%' }}
-    >
-      У вас немає завдань
-    </Typography>
-  )}
-</Grid>
-
-
+          </Grid>
         </Grid>
 
-        <Grid item xs={7}>
+        {/* Projects Section */}
+        <Grid item xs={12} md={7}>
           <Typography variant="h5">
             {user.role === 'admin' ? 'Всі проекти' : 'Мої проекти'}
           </Typography>
@@ -169,38 +207,46 @@ const Dashboard = () => {
             />
           </Box>
           {user.role === 'admin' && (
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleDialogOpen}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleDialogOpen}
+            >
               Додати проект
             </Button>
           )}
           <Grid container spacing={2} mt={2} justifyContent="center">
             {filteredProjects.length > 0 ? (
-              filteredProjects.map((project) => {
-                const projectPeople = project.team;
-
-                return (
-                  <Grid item xs={12} sm={6} key={project.id}>
-                    <Card sx={{ position: 'relative' }}>
-                      <CardContent>
-                        <Typography variant="h6">{project.name}</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {project.description}
-                        </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          component={Link}
-                          to={`/project/${project.id}`}
-                        >
-                          Деталі
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                );
-              })
+              filteredProjects.map((project) => (
+                <Grid item xs={12} sm={6} key={project.id}>
+                  <Card sx={{ minWidth: 250, maxWidth: 400 }}>
+                    <CardContent>
+                      <Typography variant="h6">{project.name}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {project.description}
+                      </Typography>
+                      <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                        {project.team.map((email) => (
+                          <Avatar sx={{ mr: 2, bgcolor: '#1976d2' }} key={email}>
+                            {email.charAt(0).toUpperCase()}
+                          </Avatar>
+                        ))}
+                      </Stack>
+                    </CardContent>
+                    <CardActions>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        component={Link}
+                        to={`/project/${project.id}`}
+                      >
+                        Деталі
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))
             ) : (
               <Typography
                 variant="body1"
@@ -213,6 +259,61 @@ const Dashboard = () => {
         </Grid>
       </Grid>
 
+      {/* Діалог додавання завдання */}
+      <Dialog open={taskDialogOpen} onClose={handleTaskDialogClose}>
+        <DialogTitle>Додати завдання</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Назва завдання"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Select
+            fullWidth
+            value={taskProjectId}
+            onChange={(e) => setTaskProjectId(e.target.value)}
+            displayEmpty
+            sx={{ mb: 2 }}
+          >
+            <MenuItem value="" disabled>
+              Виберіть проект
+            </MenuItem>
+            {projects.map((proj) => (
+              <MenuItem key={proj.id} value={proj.id}>
+                {proj.name}
+              </MenuItem>
+            ))}
+          </Select>
+          <Select
+            fullWidth
+            value={taskAssignee}
+            onChange={(e) => setTaskAssignee(e.target.value)}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              Виберіть виконавця
+            </MenuItem>
+            {projects
+              .find((proj) => proj.id === taskProjectId)
+              ?.team.map((email) => (
+                <MenuItem key={email} value={email}>
+                  {email}
+                </MenuItem>
+              ))}
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleTaskDialogClose}>Скасувати</Button>
+          <Button variant="contained" onClick={handleAddTask}>
+            Додати
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      {/* Діалог для додавання проекту */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth>
         <DialogTitle>Додати проект</DialogTitle>
         <DialogContent>
@@ -234,11 +335,12 @@ const Dashboard = () => {
           <Button onClick={handleDialogClose} color="secondary">
             Скасувати
           </Button>
-          <Button onClick={handleAddProject} variant="contained" color="primary">
+          <Button variant="contained" onClick={handleAddProject}>
             Додати
           </Button>
         </DialogActions>
       </Dialog>
+
     </Box>
   );
 };
