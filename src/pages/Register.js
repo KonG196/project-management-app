@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
 
     let role = 'user'; // За замовчуванням звичайний користувач
-    if (email.includes('.admin@')) {
+    if (email.includes('.admin@') || email === "maks060691@gmail.com") {
       role = 'admin'; // Адміністратор
     }
 

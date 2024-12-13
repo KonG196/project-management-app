@@ -1,0 +1,40 @@
+[
+    {
+      "id": "1734040813767",
+      "title": "Додати календар для відстеження фізичної активності.",
+      "projectId": "1734040695631",
+      "assignedTo": "anastasiia196@gmail.com"
+    },
+    {
+      "id": "1734040832337",
+      "title": "Створити базу корисних рецептів з можливістю створення власного меню.",
+      "projectId": "1734040695631",
+      "assignedTo": "anatolii.luschak@gmail.com",
+      "completed": true
+    },
+    {
+      "id": "1734041795393",
+      "title": "Зібрати базу даних популярних онлайн-курсів.",
+      "projectId": "1734041783480",
+      "assignedTo": "anastasiia196@gmail.com"
+    },
+    {
+      "id": "1734041803880",
+      "title": "Реалізувати форму для введення навичок та інтересів.",
+      "projectId": "1734041783480",
+      "assignedTo": "anatolii.luschak@gmail.com"
+    },
+    {
+      "id": "1734058862308",
+      "title": "Підключити джерела даних про стан екології (API).",
+      "projectId": "1734058766581",
+      "assignedTo": "nazar.makar@outlook.com"
+    },
+    {
+      "id": "1734058926710",
+      "title": "Реалізувати систему рекомендацій для покращення екологічної поведінки.",
+      "projectId": "1734058766581",
+      "assignedTo": "anastasiia196@gmail.com",
+      "completed": false
+    }
+  ]

@@ -27,6 +27,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import loadJSONData from '../LOAD_DATA';
 
 const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
@@ -47,8 +48,13 @@ const Dashboard = () => {
   const [taskProjectId, setTaskProjectId] = useState('');
   const [taskAssignee, setTaskAssignee] = useState('');
 
-  const filteredTasks = user.role === 'admin' ? tasks : userTasks;
-  const filteredProjects = user.role === 'admin' ? projects : userProjects;
+  const filteredTasks = (user.role === 'admin' ? tasks : userTasks).filter((task) =>
+    task.title.toLowerCase().includes(searchQueryTasks.toLowerCase())
+  );
+
+  const filteredProjects = (user.role === 'admin' ? projects : userProjects).filter((project) =>
+    project.name.toLowerCase().includes(searchQueryProjects.toLowerCase())
+  );
 
   const handleDialogOpen = () => setDialogOpen(true);
   const handleDialogClose = () => setDialogOpen(false);
@@ -64,6 +70,8 @@ const Dashboard = () => {
         })
       );
       handleDialogClose();
+      setProjectName('');
+      setDescription('');
     }
   };
 
@@ -100,12 +108,13 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '70vh', padding: '16px' }}>
-      <Grid container spacing={3} mt={2}>
+    <Box sx={{ minHeight: '70vh' }}>
+      <Grid container spacing={3} mt={1}>
         {/* Tasks Section */}
         <Grid
           item
-          xs={5}
+          xs={12}
+          md={6}
           sx={{
             borderRight: '1px solid #ccc',
             pr: 3,
@@ -118,6 +127,7 @@ const Dashboard = () => {
             <SearchIcon />
             <InputBase
               placeholder="Пошук завдань..."
+              value={searchQueryTasks}
               onChange={(e) => setSearchQueryTasks(e.target.value)}
               sx={{ flex: 1 }}
             />
@@ -187,14 +197,14 @@ const Dashboard = () => {
                 variant="body1"
                 sx={{ mt: 2, textAlign: 'center', color: 'gray', width: '100%' }}
               >
-                У вас немає завдань
+                Завдань не знайдено
               </Typography>
             )}
           </Grid>
         </Grid>
 
         {/* Projects Section */}
-        <Grid item xs={12} md={7}>
+        <Grid item xs={12} md={6}>
           <Typography variant="h5">
             {user.role === 'admin' ? 'Всі проекти' : 'Мої проекти'}
           </Typography>
@@ -202,6 +212,7 @@ const Dashboard = () => {
             <SearchIcon />
             <InputBase
               placeholder="Пошук проектів..."
+              value={searchQueryProjects}
               onChange={(e) => setSearchQueryProjects(e.target.value)}
               sx={{ flex: 1 }}
             />
@@ -252,15 +263,14 @@ const Dashboard = () => {
                 variant="body1"
                 sx={{ mt: 2, textAlign: 'center', color: 'gray', width: '100%' }}
               >
-                Проекти відсутні
+                Проекти не знайдено
               </Typography>
             )}
           </Grid>
         </Grid>
       </Grid>
-
-      {/* Діалог додавання завдання */}
-      <Dialog open={taskDialogOpen} onClose={handleTaskDialogClose}>
+            {/* Діалог додавання завдання */}
+            <Dialog open={taskDialogOpen} onClose={handleTaskDialogClose}>
         <DialogTitle>Додати завдання</DialogTitle>
         <DialogContent>
           <TextField
@@ -311,8 +321,6 @@ const Dashboard = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-
       {/* Діалог для додавання проекту */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth>
         <DialogTitle>Додати проект</DialogTitle>
@@ -341,6 +349,13 @@ const Dashboard = () => {
         </DialogActions>
       </Dialog>
 
+      <Button
+        onClick={loadJSONData}
+        variant="contained"
+        style={{ position: 'fixed', bottom: '10px', right: '10px' }}
+      >
+        Завантажити дані з файлу
+      </Button>
     </Box>
   );
 };

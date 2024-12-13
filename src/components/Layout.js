@@ -47,6 +47,7 @@ const Layout = ({ children }) => {
       case 'admin':
         return 'Адміністратор';
       case 'user':
+      default:
         return 'Розробник';
     }
   })();
@@ -63,6 +64,19 @@ const Layout = ({ children }) => {
           <Typography variant="h5" noWrap component="div">
             HoReCa Management Solution
           </Typography>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              marginLeft: 'auto',
+              color: role === 'Адміністратор' ? '#9c27b0' : '#1f1704',
+            }}
+          >
+            {role === 'Адміністратор' ? 'Admin edition' : 'User edition'}
+          </Typography>
+
+
         </Toolbar>
       </AppBar>
 
@@ -96,7 +110,12 @@ const Layout = ({ children }) => {
             {role !== 'Адміністратор' && (
               <>
                 <ListItem button component={Link} to="/tasks" sx={{ color: '#1f1704', padding: '15px 15px' }}>
-                  <ListItemText primary="Завдання" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
+                  <ListItemText primary="Завдання (неактивно)" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
+                </ListItem>
+                <ListItem button component={Link} to="/tasks" sx={{ color: '#1f1704', padding: '15px 15px' }}>
+                  <ListItemText primary="Проекти (неактивно)" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
+                </ListItem><ListItem button component={Link} to="/tasks" sx={{ color: '#1f1704', padding: '15px 15px' }}>
+                  <ListItemText primary="Команда (неактивно)" primaryTypographyProps={{ fontSize: '20px', fontWeight: 'bold', textAlign: 'center' }} />
                 </ListItem>
               </>
             )}
@@ -136,19 +155,19 @@ const Layout = ({ children }) => {
               {role}
             </Typography>
             <Typography
-  variant="body2"
-  color="textSecondary"
-  sx={{
-    maxWidth: '200px', // Максимальна ширина блоку
-    whiteSpace: 'nowrap', // Заборонити перенос рядка
-    overflow: 'hidden', // Приховати текст, що виходить за межі
-    textOverflow: 'ellipsis', // Додати "..." для обрізаного тексту
-    fontSize: user?.email?.length > 25 ? '0.8rem' : '1rem', // Динамічний розмір шрифта
-    textAlign: 'center', // Вирівнювання по центру
-  }}
->
-  {user?.email}
-</Typography>
+              variant="body2"
+              color="textSecondary"
+              sx={{
+                maxWidth: '200px', // Максимальна ширина блоку
+                whiteSpace: 'nowrap', // Заборонити перенос рядка
+                overflow: 'hidden', // Приховати текст, що виходить за межі
+                textOverflow: 'ellipsis', // Додати "..." для обрізаного тексту
+                fontSize: user?.email?.length > 25 ? '0.8rem' : '1rem', // Динамічний розмір шрифта
+                textAlign: 'center', // Вирівнювання по центру
+              }}
+            >
+              {user?.email}
+            </Typography>
             <Button
               variant="contained"
               color="secondary"

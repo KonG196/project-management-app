@@ -1,0 +1,8 @@
+[
+    {"email":"maks060691@gmail.com","password":"$2a$10$YDKKHm90e9rpXG3jbb5DeezjBri9N99p1ylofelgl5Xj0ZVlTvmm.","name":"Максим Нагина","role":"admin"},
+    {"email":"anastasiia196@gmail.com","password":"$2a$10$JBYTwgjAzxp.BIcHlsaWWuLK3fGs.bJmcxy9Xd1sNijhdaAoyD.4W","name":"Анастасія Гіжевська","role":"user"},
+    {"email":"anatolii.luschak@gmail.com","password":"$2a$10$VKo6LSvJKkt6RFlclujI.OM95nk1pYmzBB7Ewi7nECBHk5okh089G","name":"Анатолій Лущак","role":"user"},
+    {"email":"anton.makar@outlook.com","password":"$2a$10$65bVCXu3suZNNna5pjB9zegJ5dFOZXVbsm3YAg84YUYunyXK/b7ri","name":"Антон Макаренко","role":"user"},
+    {"email":"nazar.makar@outlook.com","password":"$2a$10$z.z8KW2SzJEjgoaYGgTi6.H/HEkQEuUqj0xa7Xex.UuOmuhpmCDey","name":"Назар Макаренко","role":"user"}
+  ]
+  
