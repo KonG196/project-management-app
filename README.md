@@ -73,16 +73,9 @@ If you are on the login page, you need to click on the “Load data from file”
 #### PASSWORD: 1234
 #### After entering the page, the tasks and projects should be filled in.
 #### If they are empty, click the “Load data from file” button again and refresh the page.
-
-
-
-
-
-
-
-
-
-
+---
+---
+---
 # Розумна платформа для управління електронними проектами
 
 ## Порядок встановлення та налаштування системи
